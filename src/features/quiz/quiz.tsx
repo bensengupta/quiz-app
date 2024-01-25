@@ -49,6 +49,7 @@ export function Quiz() {
 
         {QUIZ_QUESTIONS_CAPITALS.map((question, index) => {
           const chosenAnswer = chosenAnswers[index];
+
           return (
             <div key={index}>
               <h3>{question.questionText}</h3>
