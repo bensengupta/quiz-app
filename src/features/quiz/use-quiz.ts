@@ -1,39 +1,39 @@
 import { useState } from 'react';
 
-export interface QuizAnswer {
-  answerText: string;
-  isCorrect: boolean;
-}
-
 export interface QuizQuestion {
   questionText: string;
-  answers: QuizAnswer[];
+  correctAnswerIndex: number;
+  choices: string[];
 }
 
 export function useQuiz(questions: QuizQuestion[]) {
   const [chosenAnswerIndices, setChosenAnswerIndices] = useState<number[]>([]);
 
   const chosenAnswers = chosenAnswerIndices.map(
-    (answerIdx, questionIdx) => questions[questionIdx].answers[answerIdx]
+    (answerIdx, questionIdx) => questions[questionIdx].choices[answerIdx]
   );
 
   const currentQuestionIndex = chosenAnswerIndices.length;
   const currentQuestion = questions[currentQuestionIndex];
-  const score = chosenAnswers.reduce(
-    (acc, answer) => acc + Number(answer.isCorrect),
-    0
-  );
+  const score = chosenAnswerIndices.reduce((acc, answer, idx) => {
+    return acc + Number(questions[idx].correctAnswerIndex === answer);
+  }, 0);
 
-  function onChooseAnswer(answerIdx: number) {
+  function chooseAnswer(answerIdx: number) {
     setChosenAnswerIndices([...chosenAnswerIndices, answerIdx]);
+  }
+
+  function reset() {
+    setChosenAnswerIndices([]);
   }
 
   return {
     isFinished: currentQuestionIndex >= questions.length,
     currentQuestionIndex,
     currentQuestion,
-    onChooseAnswer,
     chosenAnswers,
     score,
+    chooseAnswer,
+    reset,
   };
 }

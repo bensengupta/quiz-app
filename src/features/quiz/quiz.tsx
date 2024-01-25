@@ -1,32 +1,22 @@
+import { Question } from './question';
+import { QuestionResult } from './results';
 import { QuizQuestion, useQuiz } from './use-quiz';
 
 const QUIZ_QUESTIONS_CAPITALS: QuizQuestion[] = [
   {
     questionText: 'What is the capital of France?',
-    answers: [
-      { answerText: 'London', isCorrect: false },
-      { answerText: 'Berlin', isCorrect: false },
-      { answerText: 'Paris', isCorrect: true },
-      { answerText: 'Madrid', isCorrect: false },
-    ],
+    correctAnswerIndex: 2,
+    choices: ['London', 'Berlin', 'Paris', 'Madrid'],
   },
   {
     questionText: 'What is the capital of Sweden?',
-    answers: [
-      { answerText: 'Stockholm', isCorrect: true },
-      { answerText: 'Oslo', isCorrect: false },
-      { answerText: 'Bucharest', isCorrect: false },
-      { answerText: 'Istanbul', isCorrect: false },
-    ],
+    correctAnswerIndex: 0,
+    choices: ['Stockholm', 'Oslo', 'Bucharest', 'Istanbul'],
   },
   {
     questionText: 'What is the capital of Poland?',
-    answers: [
-      { answerText: 'Rome', isCorrect: false },
-      { answerText: 'Kyiv', isCorrect: false },
-      { answerText: 'Misk', isCorrect: false },
-      { answerText: 'Warsaw', isCorrect: true },
-    ],
+    correctAnswerIndex: 3,
+    choices: ['Rome', 'Kyiv', 'Misk', 'Warsaw'],
   },
 ];
 
@@ -36,8 +26,9 @@ export function Quiz() {
     score,
     currentQuestion,
     currentQuestionIndex,
-    onChooseAnswer,
     chosenAnswers,
+    chooseAnswer,
+    reset,
   } = useQuiz(QUIZ_QUESTIONS_CAPITALS);
 
   if (isFinished) {
@@ -45,27 +36,19 @@ export function Quiz() {
       <div>
         <h1>Quiz Finished</h1>
 
-        <h3>Final score: {score}</h3>
+        <h2>Final score: {score}</h2>
 
         {QUIZ_QUESTIONS_CAPITALS.map((question, index) => {
-          const chosenAnswer = chosenAnswers[index];
-
           return (
-            <div key={index}>
-              <h3>{question.questionText}</h3>
-              <p>You chose: {chosenAnswer.answerText}</p>
-
-              {chosenAnswer.isCorrect ? (
-                <p>Correct!</p>
-              ) : (
-                <p>
-                  Incorrect. Correct answer:{' '}
-                  {question.answers.find((ans) => ans.isCorrect)?.answerText}
-                </p>
-              )}
-            </div>
+            <QuestionResult
+              questionText={question.questionText}
+              chosenAnswer={chosenAnswers[index]}
+              correctAnswer={question.choices[question.correctAnswerIndex]}
+            />
           );
         })}
+
+        <button onClick={reset}>Restart quiz</button>
       </div>
     );
   }
@@ -74,14 +57,12 @@ export function Quiz() {
     <div>
       <h1>Quiz</h1>
 
-      <h3>Question {currentQuestionIndex + 1}</h3>
-
-      <p>{currentQuestion.questionText}</p>
-      {currentQuestion.answers.map((answer, index) => (
-        <button key={index} onClick={() => onChooseAnswer(index)}>
-          {answer.answerText}
-        </button>
-      ))}
+      <Question
+        questionNumber={currentQuestionIndex + 1}
+        questionText={currentQuestion.questionText}
+        answers={currentQuestion.choices}
+        onChooseAnswer={chooseAnswer}
+      />
     </div>
   );
 }
